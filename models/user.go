@@ -26,7 +26,7 @@ func (u *UserModel) Signup(data forms.SignupUserCommand) error {
     err := collection.Insert(bson.M{
         "username":    data.Username,
         "email":       data.Email,
-        "password":    data.Password,
+        "password": helpers.GeneratePasswordHash([]byte(data.Password)),
         // This will come later when adding verification
         "is_verified": false,
     })
