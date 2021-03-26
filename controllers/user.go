@@ -37,6 +37,16 @@ func (u *UserController) Signup(c *gin.Context) {
             return
         }
     */
+		
+		result, _ := userModel.GetUserByEmail(data.Email)
+
+		// If there happens to be a result respond with a 
+		// descriptive mesage
+		if result.Email != "" {
+				c.JSON(403, gin.H{"message": "This email has already registered"})
+				c.Abort()
+				return
+		}
 
     err := userModel.Signup(data)
 
@@ -48,4 +58,6 @@ func (u *UserController) Signup(c *gin.Context) {
     }
 
     c.JSON(201, gin.H{"message": "Your account has been created"})
+
+		
 }
