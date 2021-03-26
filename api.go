@@ -34,6 +34,11 @@ func main() {
         v1.GET("/ping", ping.Default)
     }
 
+		// Define the user controller
+		user := new(controllers.UserController)
+		// Create the signup endpoint
+		v1.POST("/signup", user.Signup)
+
     // Handle error response when a route is not defined
     router.NoRoute(func(c *gin.Context) {
         // In gin this is how you return a JSON response
