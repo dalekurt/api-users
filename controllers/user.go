@@ -1,9 +1,11 @@
 package controllers
 
 import (
-    "github.com/gin-gonic/gin"
-    "github.com/dalekurt/api-users/forms"
-    "github.com/dalekurt/api-users/models"
+	"github.com/gin-gonic/gin"
+	"github.com/dalekurt/api-users/forms"
+	"github.com/dalekurt/api-users/models"
+	"github.com/dalekurt/api-users/helpers"
+	"github.com/dalekurt/api-users/services"
 )
 
 // Import the userModel from the models
@@ -37,7 +39,7 @@ func (u *UserController) Signup(c *gin.Context) {
             return
         }
     */
-		
+
 		result, _ := userModel.GetUserByEmail(data.Email)
 
 		// If there happens to be a result respond with a 
@@ -58,6 +60,55 @@ func (u *UserController) Signup(c *gin.Context) {
     }
 
     c.JSON(201, gin.H{"message": "Your account has been created"})
+}
 
-		
+// Login allows a user to login a user and get
+// access token
+func (u *UserController) Login(c *gin.Context) {
+	var data forms.LoginUserCommand
+
+	// Bind the request body data to var data and check if all details are provided
+	if c.BindJSON(&data) != nil {
+			c.JSON(406, gin.H{"message": "Invalid or missing credentials"})
+			c.Abort()
+			return
+	}
+
+	result, err := userModel.GetUserByEmail(data.Email)
+
+	if result.Email == "" {
+			c.JSON(404, gin.H{"message": "Authentication Error, User Not found"})
+			c.Abort()
+			return
+	}
+
+	if err != nil {
+			c.JSON(400, gin.H{"message": "Login error"})
+			c.Abort()
+			return
+	}
+
+	// Get the hashed password from the saved document
+	hashedPassword := []byte(result.Password)
+	// Get the password provided in the request.body
+	password := []byte(data.Password)
+
+	err = helpers.PasswordCompare(password, hashedPassword)
+
+	if err != nil {
+			c.JSON(403, gin.H{"message": "Invalid user credentials"})
+			c.Abort()
+			return
+	}
+
+	jwtToken, err2 := services.GenerateToken(data.Email)
+
+	// If we fail to generate token for access
+	if err2 != nil {
+			c.JSON(403, gin.H{"message": "There was a problem logging you in, try again later"})
+			c.Abort()
+			return
+	}
+
+	c.JSON(200, gin.H{"message": "Log in success", "token": jwtToken})
 }
