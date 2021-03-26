@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	// Log items to the terminal
 	"log"
 
@@ -21,11 +23,20 @@ func init() {
 }
 
 func main() {
+	// Checking that the envronment variable is present or not for APP_PORT
+	port, exists := os.LookupEnv("API_PORT")
+	if !exists {
+		fmt.Println("The environment variable API_PORT is not set")
+	} else {
+		fmt.Printf("Starting User API listening on port " + port)
+	}
 	// Init gin router
 	router := gin.Default()
 
 	// Its great to version your API's
-	v1 := router.Group("/api/v1")
+	api := router.Group("/api")
+	v1 := api.Group("/v1")
+	users := v1.Group("/users")  
 	{
 			// Define the ping controller
 			ping := new(controllers.PingController)
@@ -38,10 +49,10 @@ func main() {
 	user := new(controllers.UserController)
 
 	// Create the signup endpoint
-	v1.POST("/signup", user.Signup)
+	users.POST("/signup", user.Signup)
 
 	// Create the login endpoint
-	v1.POST("/login", user.Login)
+	users.POST("/login", user.Login)
 
 	// Handle error response when a route is not defined
 	router.NoRoute(func(c *gin.Context) {
@@ -49,7 +60,8 @@ func main() {
 			c.JSON(404, gin.H{"message": "Not found"})
 	})
 
+	// TODO: Use env var for port
 	// Init our server
-	router.Run(":3000")
+	router.Run(":" + port)
 }
 
