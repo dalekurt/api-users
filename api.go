@@ -54,6 +54,21 @@ func main() {
 	// Create the login endpoint
 	users.POST("/login", user.Login)
 
+	// Send reset link
+	users.PUT("/reset-link", user.ResetLink)
+
+	// Password reset
+	users.PUT("/password-reset", user.PasswordReset)
+
+	// Send verify link
+	users.PUT("/verify-link", user.VerifyLink)
+
+	// Verify account
+	users.PUT("/verify-account", user.VerifyAccount)
+
+	// Refresh token
+	users.GET("/refresh", user.RefreshToken)
+
 	// Handle error response when a route is not defined
 	router.NoRoute(func(c *gin.Context) {
 			// In gin this is how you return a JSON response
