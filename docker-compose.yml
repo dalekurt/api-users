@@ -1,6 +1,21 @@
 version: "3.8"
 services:
-  mongodb:
+  # User API
+  api:
+    image: dalekurt/users
+    container_name: users
+    environment:
+      - API_PORT=3001
+      - DATABASE_HOST=mongo
+      - DATABASE_NAME=users
+      - SECRET_KEY=Y76!.@McoyQFFvHhbPxr98aZMHEDNBY9
+      - SENDGRID_API_KEY=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
+    depends_on:
+      - 'mongo'
+    ports:
+      - 3001:3001
+  # MongoDB database
+  mongo:
     image : mongo
     container_name: mongodb
     environment:
@@ -11,3 +26,14 @@ services:
     ports:
       - 27017:27017
     restart: unless-stopped
+  # Mongo Express Web-based MongoDB admin interface
+  mongo_express:
+      image: mongo-express
+      container_name: mongo_express
+      environment:
+        - ME_CONFIG_MONGODB_SERVER=mongo
+      depends_on:
+          - 'mongo'
+      ports:
+          - '8081:8081'
+      restart: always
