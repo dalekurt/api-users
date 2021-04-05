@@ -5,11 +5,11 @@ services:
     image: dalekurt/users
     container_name: users
     environment:
-      - API_PORT=3001
+      - API_PORT=${API_PORT}
       - DATABASE_HOST=mongo
       - DATABASE_NAME=users
-      - SECRET_KEY=Y76!.@McoyQFFvHhbPxr98aZMHEDNBY9
-      - SENDGRID_API_KEY=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
+      - SECRET_KEY=${SECRET_KEY}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
     depends_on:
       - 'mongo'
     ports:
