@@ -1,0 +1,9 @@
+_format_version: "2.1"
+
+services:
+  - name: users
+    url: users-api
+    routes:
+      - name: users-api-route
+        paths:
+          - /users
